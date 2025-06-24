@@ -13,7 +13,7 @@ import numpy as np
 from float_4e3m import Float_4E3M
 from generator import generate_all_float_4e3m, print_all_representations, analyze_value_distribution
 from conversion_utils import value_to_bitstream, value_to_components, demonstrate_conversion
-from operations import generate_addition_table, analyze_addition_results, create_operation_matrix
+from operations import generate_addition_table, analyze_addition_results, create_operation_matrix, save_addition_results_to_files, save_operation_results_to_files
 
 
 def test_special_cases():
@@ -144,3 +144,4 @@ def main():
     print("-" * 50)
     test_values = [-0.25, 0.0, 1.0, -1.0, 0.5, -0.5, 0.125]
 
+    
