@@ -1,0 +1,17 @@
+
+read_verilog addition/synthesis_results/float_4e3m_adder_behavioral.v
+hierarchy -check -top float_4e3m_adder
+proc
+opt
+fsm
+opt
+memory
+opt
+techmap
+opt
+abc -liberty
+opt
+clean
+stat
+write_verilog addition/synthesis_results/float_4e3m_adder_yosys_optimized.v
+write_blif addition/synthesis_results/float_4e3m_adder_yosys_optimized.blif
