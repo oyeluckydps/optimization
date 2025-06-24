@@ -1,6 +1,7 @@
 """
 Circuit Synthesis for Float_4E3M Adder
-Converts CSV truth tables to optimized digital circuits using ABC/Yosys
+Focused on generating optimized circuits with minimum gates and levels
+Supports all gate types: AND, OR, NOT, XOR, XNOR, MUX for ASIC optimization
 """
 
 import csv
@@ -24,11 +25,11 @@ def check_tool_availability(tool_name: str) -> bool:
 
 def csv_to_abc_hierarchical_synthesis(csv_filename: str, output_dir: str = "abc_output") -> None:
     """
-    Convert CSV file to ABC format and perform hierarchical synthesis for all 8 outputs together.
+    Convert CSV file to optimized circuits using ABC and Yosys for minimum gates/levels.
     
     Args:
         csv_filename (str): Input CSV file with operand1, operand2, result columns
-        output_dir (str): Directory to store ABC files and results
+        output_dir (str): Directory to store synthesis results
     """
     
     # Convert to absolute paths
@@ -88,17 +89,413 @@ def csv_to_abc_hierarchical_synthesis(csv_filename: str, output_dir: str = "abc_
         return
     
     # Generate separate truth tables (for reference/analysis)
-    print("\nGenerating separate truth tables for analysis...")
+    print("\nGenerating separate truth tables for reference...")
     for bit_pos in range(8):
         generate_separate_truth_table(truth_table_data, bit_pos, separate_dir)
     
     # Generate combined truth table for hierarchical synthesis
-    print("\nGenerating combined truth table for hierarchical synthesis...")
+    print("\nGenerating combined truth table for synthesis...")
     combined_file = generate_combined_truth_table(truth_table_data, combined_dir)
     
-    # Perform hierarchical synthesis on all 8 outputs simultaneously
-    print("\nPerforming hierarchical synthesis...")
-    perform_hierarchical_synthesis(combined_file, results_dir)
+    # Perform optimized synthesis for minimum gates and levels
+    print("\nPerforming optimized synthesis for minimum gates and levels...")
+    perform_optimized_synthesis(combined_file, results_dir)
+
+
+def generate_separate_truth_table(truth_table_data: List[Tuple[str, str]], 
+                                 bit_position: int, separate_dir: str) -> str:
+    """Generate separate truth table file for analysis."""
+    
+    filename = os.path.join(separate_dir, f"output_bit_{bit_position}.tt")
+    
+    with open(filename, 'w') as f:
+        # ABC truth table header
+        f.write(".i 16\n")  # 16 input bits
+        f.write(".o 1\n")   # 1 output bit
+        f.write(f".p {len(truth_table_data)}\n")  # Number of product terms
+        
+        # Write truth table entries
+        for input_bits, output_bits in truth_table_data:
+            output_bit = output_bits[bit_position]
+            f.write(f"{input_bits} {output_bit}\n")
+        
+        f.write(".e\n")
+    
+    print(f"  Generated separate truth table for bit {bit_position}")
+    return filename
+
+
+def generate_combined_truth_table(truth_table_data: List[Tuple[str, str]], 
+                                 combined_dir: str) -> str:
+    """Generate combined truth table file for synthesis."""
+    
+    filename = os.path.join(combined_dir, "float_4e3m_adder.tt")
+    
+    with open(filename, 'w') as f:
+        # ABC truth table header
+        f.write(".i 16\n")  # 16 input bits (op1[7:0] + op2[7:0])
+        f.write(".o 8\n")   # 8 output bits
+        f.write(f".p {len(truth_table_data)}\n")  # Number of product terms
+        
+        # Add input/output names for better readability
+        f.write(".ilb op1_7 op1_6 op1_5 op1_4 op1_3 op1_2 op1_1 op1_0 ")
+        f.write("op2_7 op2_6 op2_5 op2_4 op2_3 op2_2 op2_1 op2_0\n")
+        f.write(".ob result_7 result_6 result_5 result_4 result_3 result_2 result_1 result_0\n")
+        
+        # Write truth table entries
+        for input_bits, output_bits in truth_table_data:
+            f.write(f"{input_bits} {output_bits}\n")
+        
+        f.write(".e\n")
+    
+    print(f"  Generated combined truth table: {filename}")
+    return filename
+
+
+def perform_optimized_synthesis(truth_table_file: str, results_dir: str) -> None:
+    """
+    Perform optimized synthesis using both ABC and Yosys for minimum gates and levels.
+    Focuses purely on synthesis - analysis moved to separate file.
+    """
+    
+    # Check which synthesis tools are available
+    abc_available = check_tool_availability("abc")
+    yosys_available = check_tool_availability("yosys")
+    
+    print(f"Available tools: ABC={abc_available}, Yosys={yosys_available}")
+    
+    if abc_available:
+        print("\n1. Running ABC optimization for minimum gates and levels...")
+        perform_abc_gate_optimization(truth_table_file, results_dir)
+    
+    if yosys_available:
+        print("\n2. Running Yosys ASIC optimization for minimum gates...")
+        perform_yosys_asic_optimization(truth_table_file, results_dir)
+    
+    if not abc_available and not yosys_available:
+        print("✗ Neither ABC nor Yosys found!")
+        print_installation_instructions()
+
+
+def perform_abc_gate_optimization(truth_table_file: str, results_dir: str) -> None:
+    """Perform ABC optimization focused on minimum gates and levels."""
+    
+    # ABC script optimized for minimum gates and logic levels
+    abc_script = f"""
+# Read truth table
+read_truth {truth_table_file}
+strash
+
+# Aggressive optimization for minimum gates and levels
+balance
+rewrite -l
+refactor -l
+balance
+rewrite -l
+refactor -l
+balance
+
+# Multi-level optimization
+compress2rs
+balance
+choice
+balance
+fraig
+balance
+
+# Area-focused technology mapping with all gate types
+map -a
+
+# Write optimized results
+write_verilog {results_dir}/abc_min_gates.v
+write_blif {results_dir}/abc_min_gates.blif
+write_bench {results_dir}/abc_min_gates.bench
+
+quit
+"""
+    
+    script_file = os.path.join(results_dir, "abc_gate_optimization.abc")
+    with open(script_file, 'w') as f:
+        f.write(abc_script)
+    
+    try:
+        result = subprocess.run(
+            ["abc", "-f", script_file], 
+            capture_output=True, 
+            text=True, 
+            cwd=results_dir
+        )
+        
+        if result.returncode == 0:
+            print("✓ ABC gate optimization completed!")
+            
+            # Save ABC synthesis log
+            with open(os.path.join(results_dir, "abc_synthesis.log"), 'w') as f:
+                f.write("ABC Gate Optimization Log\n")
+                f.write("=" * 35 + "\n\n")
+                f.write(result.stdout)
+            
+            print(f"  Generated: abc_min_gates.v, abc_min_gates.blif")
+            
+        else:
+            print(f"✗ ABC gate optimization failed: {result.stderr}")
+    
+    except FileNotFoundError:
+        print("✗ ABC not found")
+    except Exception as e:
+        print(f"✗ ABC optimization failed: {e}")
+
+
+def perform_yosys_asic_optimization(truth_table_file: str, results_dir: str) -> None:
+    """Perform Yosys ASIC optimization for minimum gates with all gate types."""
+    
+    # Convert truth table to Verilog first
+    verilog_file = convert_truth_table_to_verilog(truth_table_file, results_dir)
+    abs_verilog_file = os.path.abspath(verilog_file)
+    
+    # Yosys script optimized for ASIC with all gate types
+    yosys_script = f"""# Read behavioral Verilog
+read_verilog {abs_verilog_file}
+hierarchy -check -top float_4e3m_adder
+
+# Convert behavioral to structural
+proc
+opt
+
+# Technology mapping for ASIC (not FPGA)
+techmap
+opt
+
+# Enable all gate types for optimization
+# Use generic library that supports all gates
+abc
+
+# Alternative optimization approaches
+opt
+opt_clean
+
+# Final optimization
+opt -full
+
+# Write ASIC-optimized results  
+write_verilog {results_dir}/yosys_asic_optimized.v
+write_blif {results_dir}/yosys_asic_optimized.blif
+write_json {results_dir}/yosys_circuit.json
+"""
+    
+    script_file = os.path.join(results_dir, "yosys_asic_optimization.ys")
+    
+    with open(script_file, 'w') as f:
+        f.write(yosys_script)
+    
+    try:
+        result = subprocess.run(
+            ["yosys", "-s", script_file],
+            capture_output=True,
+            text=True,
+            cwd=results_dir
+        )
+        
+        if result.returncode == 0:
+            print("✓ Yosys ASIC optimization completed!")
+            
+            # Save Yosys synthesis log
+            with open(os.path.join(results_dir, "yosys_synthesis.log"), 'w') as f:
+                f.write("Yosys ASIC Optimization Log\n")
+                f.write("=" * 35 + "\n\n")
+                f.write(result.stdout)
+            
+            print(f"  Generated: yosys_asic_optimized.v, yosys_asic_optimized.blif")
+            
+        else:
+            print(f"✗ Yosys ASIC optimization failed: {result.stderr}")
+            print("\nTrying fallback ASIC optimization...")
+            perform_yosys_fallback_asic(abs_verilog_file, results_dir)
+    
+    except Exception as e:
+        print(f"✗ Yosys ASIC optimization failed: {e}")
+
+
+def perform_yosys_fallback_asic(verilog_file: str, results_dir: str) -> None:
+    """Fallback Yosys ASIC optimization with simpler commands."""
+    
+    # Simplified Yosys script for ASIC
+    fallback_script = f"""read_verilog {verilog_file}
+hierarchy -check -top float_4e3m_adder
+proc
+opt
+techmap
+opt
+abc
+opt
+write_verilog {results_dir}/yosys_fallback_asic.v
+write_blif {results_dir}/yosys_fallback_asic.blif
+"""
+    
+    script_file = os.path.join(results_dir, "yosys_fallback.ys")
+    
+    with open(script_file, 'w') as f:
+        f.write(fallback_script)
+    
+    try:
+        result = subprocess.run(
+            ["yosys", "-s", script_file],
+            capture_output=True,
+            text=True,
+            cwd=results_dir
+        )
+        
+        if result.returncode == 0:
+            print("✓ Yosys fallback ASIC optimization completed!")
+            
+            with open(os.path.join(results_dir, "yosys_fallback.log"), 'w') as f:
+                f.write("Yosys Fallback ASIC Log\n")
+                f.write("=" * 30 + "\n\n")
+                f.write(result.stdout)
+            
+            print(f"  Generated: yosys_fallback_asic.v")
+            
+        else:
+            print(f"✗ Yosys fallback optimization failed: {result.stderr}")
+    
+    except Exception as e:
+        print(f"✗ Yosys fallback optimization failed: {e}")
+
+
+def convert_truth_table_to_verilog(truth_table_file: str, results_dir: str) -> str:
+    """Convert truth table to behavioral Verilog for Yosys."""
+    
+    verilog_file = os.path.join(results_dir, "float_4e3m_adder_behavioral.v")
+    
+    print(f"  Converting truth table to behavioral Verilog...")
+    
+    # Read truth table
+    truth_table_entries = []
+    
+    if not os.path.exists(truth_table_file):
+        print(f"✗ Truth table file not found: {truth_table_file}")
+        return verilog_file
+    
+    with open(truth_table_file, 'r') as f:
+        lines = f.readlines()
+        
+        # Skip header lines and parse entries
+        for line_num, line in enumerate(lines):
+            line = line.strip()
+            if line and not line.startswith('.') and ' ' in line:
+                parts = line.split()
+                if len(parts) >= 2 and len(parts[0]) == 16 and len(parts[1]) == 8:
+                    truth_table_entries.append((parts[0], parts[1]))
+    
+    print(f"  ✓ Parsed {len(truth_table_entries)} truth table entries")
+    
+    if len(truth_table_entries) == 0:
+        print("✗ No valid truth table entries found!")
+        return verilog_file
+    
+    # Generate behavioral Verilog
+    with open(verilog_file, 'w') as f:
+        f.write("// Float_4E3M Adder - Behavioral Verilog\n")
+        f.write("// Optimized for ASIC synthesis with all gate types\n\n")
+        f.write("module float_4e3m_adder(\n")
+        f.write("    input [15:0] operands,  // {op1[7:0], op2[7:0]}\n")
+        f.write("    output reg [7:0] result\n")
+        f.write(");\n\n")
+        f.write("always @(*) begin\n")
+        f.write("    case (operands)\n")
+        
+        for input_bits, output_bits in truth_table_entries:
+            f.write(f"        16'b{input_bits}: result = 8'b{output_bits};\n")
+        
+        f.write("        default: result = 8'b00000000;\n")
+        f.write("    endcase\n")
+        f.write("end\n\n")
+        f.write("endmodule\n")
+    
+    print(f"  ✓ Generated behavioral Verilog: {verilog_file}")
+    
+    return verilog_file
+
+
+def print_installation_instructions():
+    """Print installation instructions for synthesis tools."""
+    
+    print("\nINSTALLATION INSTRUCTIONS:")
+    print("=" * 30)
+    print("\n1. Install ABC from source:")
+    print("   git clone https://github.com/berkeley-abc/abc.git")
+    print("   cd abc")
+    print("   make")
+    print("   sudo cp abc /usr/local/bin/")
+    
+    print("\n2. Install Yosys:")
+    print("   sudo apt-get install yosys")
+    
+    print("\n3. Install build dependencies:")
+    print("   sudo apt-get install build-essential git cmake")
+    
+    print("\n4. Verify installation:")
+    print("   abc -h")
+    print("   yosys -h")
+
+
+def main():
+    """Main function for optimized circuit synthesis."""
+    
+    # Updated paths to match the new TT directory structure
+    csv_file = "addition/TT/demo_addition_results.csv"
+    output_directory = "addition/TT/optimized_synthesis"
+    
+    print("Float_4E3M Optimized Circuit Synthesis")
+    print("=" * 50)
+    print("Goal: Minimum gates and levels with all gate types")
+    print("Target: ASIC optimization (not FPGA)")
+    print("Gates: AND, OR, NOT, NAND, NOR, XOR, XNOR, MUX allowed")
+    print()
+    
+    # Convert relative paths to absolute paths
+    abs_csv_file = os.path.abspath(csv_file)
+    abs_output_dir = os.path.abspath(output_directory)
+    
+    print(f"CSV file: {abs_csv_file}")
+    print(f"Output directory: {abs_output_dir}")
+    
+    if not os.path.exists(abs_csv_file):
+        print(f"✗ Error: CSV file not found at: {abs_csv_file}")
+        print("Please run generate_circuits.py first to create the CSV files.")
+        return
+    
+    print(f"✓ CSV file found")
+    
+    # Perform optimized synthesis
+    csv_to_abc_hierarchical_synthesis(abs_csv_file, abs_output_dir)
+    
+    print("\n" + "=" * 50)
+    print("Optimized Synthesis Complete!")
+    print(f"Results available in: {abs_output_dir}/synthesis_results/")
+    
+    print("\nGenerated Files:")
+    print("ABC Optimization:")
+    print("  - abc_min_gates.v     (Minimum gates Verilog)")
+    print("  - abc_min_gates.blif  (BLIF format)")
+    print("  - abc_synthesis.log   (ABC optimization log)")
+    
+    print("\nYosys ASIC Optimization:")
+    print("  - yosys_asic_optimized.v   (ASIC optimized Verilog)")
+    print("  - yosys_asic_optimized.blif (BLIF format)")
+    print("  - yosys_synthesis.log      (Yosys optimization log)")
+    
+    print("\nOptimization Focus:")
+    print("✓ Minimum number of gates")
+    print("✓ Minimum logic levels (critical path)")
+    print("✓ All gate types allowed (AND,OR,NOT,NAND,NOR,XOR,XNOR,MUX)")
+    print("✓ ASIC-focused (not FPGA LUTs)")
+    
+    print("\nNext step: Run analyze_circuits.py for timing analysis")
+
+
+if __name__ == "__main__":
+    main()
 
 
 def generate_separate_truth_table(truth_table_data: List[Tuple[str, str]], 
@@ -278,10 +675,10 @@ def perform_yosys_synthesis(truth_table_file: str, results_dir: str) -> None:
     yosys_script = f"""read_verilog {abs_verilog_file}
 hierarchy -check -top float_4e3m_adder
 proc
+synth -nomem
 opt
 fsm
 opt
-memory
 opt
 techmap
 opt
@@ -426,7 +823,7 @@ def extract_yosys_basic_stats(yosys_output: str, results_dir: str) -> None:
                 except:
                     pass
             
-            elif any(gate_type in line for gate_type in ['AND', 'OR', 'NOT', 'XOR', 'NAND', 'NOR']):
+            elif any(gate_type in line for gate_type in ['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'NAND', 'NOR']):
                 if any(char.isdigit() for char in line):
                     f.write(f"Gate Type: {line.strip()}\n")
         
@@ -630,21 +1027,35 @@ def convert_truth_table_to_verilog(truth_table_file: str, results_dir: str) -> s
     
     # Generate behavioral Verilog
     with open(verilog_file, 'w') as f:
-        f.write("// Float_4E3M Adder - Behavioral Verilog\n")
-        f.write("// Generated from truth table\n\n")
+        f.write("// Float_4E3M Adder - Explicit Combinational Logic\n")
         f.write("module float_4e3m_adder(\n")
-        f.write("    input [15:0] operands,  // {op1[7:0], op2[7:0]}\n")
-        f.write("    output reg [7:0] result\n")
+        f.write("    input [15:0] operands,\n")
+        f.write("    output [7:0] result\n")  # Use wire, not reg
         f.write(");\n\n")
-        f.write("always @(*) begin\n")
-        f.write("    case (operands)\n")
         
-        for input_bits, output_bits in truth_table_entries:
-            f.write(f"        16'b{input_bits}: result = 8'b{output_bits};\n")
+        # Generate explicit assign statements for each output bit
+        for bit_pos in range(8):
+            f.write(f"assign result[{bit_pos}] = ")
+            
+            terms = []
+            for input_bits, output_bits in truth_table_entries:
+                if output_bits[bit_pos] == '1':
+                    # Create AND term for this minterm
+                    literals = []
+                    for i in range(16):
+                        if input_bits[i] == '1':
+                            literals.append(f"operands[{15-i}]")
+                        else:
+                            literals.append(f"~operands[{15-i}]")
+                    
+                    term = "(" + " & ".join(literals) + ")"
+                    terms.append(term)
+            
+            if terms:
+                f.write(" |\n    ".join(terms) + ";\n\n")
+            else:
+                f.write("1'b0;\n\n")
         
-        f.write("        default: result = 8'b00000000;\n")
-        f.write("    endcase\n")
-        f.write("end\n\n")
         f.write("endmodule\n")
     
     print(f"✓ Generated behavioral Verilog: {verilog_file}")
@@ -766,7 +1177,7 @@ def main():
     """Main function for hierarchical synthesis."""
     
     # Updated paths to match the new TT directory structure
-    csv_file = "addition/TT/demo_addition_results.csv"
+    csv_file = "addition/TT/complete_addition_results.csv"
     output_directory = "addition/TT/hierarchical_synthesis"
     
     print("Float_4E3M Hierarchical Circuit Synthesis")
@@ -826,3 +1237,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
