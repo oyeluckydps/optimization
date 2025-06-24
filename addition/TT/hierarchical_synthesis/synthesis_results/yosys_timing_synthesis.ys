@@ -1,0 +1,36 @@
+read_verilog /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/float_4e3m_adder_behavioral.v
+hierarchy -check -top float_4e3m_adder
+proc
+opt
+fsm
+opt
+memory
+opt
+techmap
+opt
+
+# Timing analysis before ABC
+tee -o /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/pre_abc_stats.log stat
+tee -o /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/pre_abc_check.log check
+
+# ABC optimization without liberty file
+abc -lut 4
+
+# Post-optimization analysis
+tee -o /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/post_abc_stats.log stat
+tee -o /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/final_check.log check
+
+opt
+clean
+
+# Final statistics and timing
+tee -o /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/final_stats.log stat -top float_4e3m_adder
+tee -o /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/depth_analysis.log stat -tech cmos
+
+# Generate visualization (check if show command is available)
+show -format dot -prefix /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/circuit_visualization
+
+# Write outputs
+write_verilog /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/float_4e3m_adder_yosys_optimized.v
+write_blif /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/float_4e3m_adder_yosys_optimized.blif
+write_json /mnt/d/OneDrive/projects/Attention-VLSI/optimization/addition/TT/hierarchical_synthesis/synthesis_results/float_4e3m_adder_circuit.json

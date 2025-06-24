@@ -1,0 +1,17 @@
+
+11. Printing statistics.
+
+=== float_4e3m_adder ===
+
+   Number of wires:                620
+   Number of wire bits:           1112
+   Number of public wires:           2
+   Number of public wire bits:      24
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                859
+     $_MUX_                          3
+     $_NOT_                        261
+     $_OR_                         595
+
