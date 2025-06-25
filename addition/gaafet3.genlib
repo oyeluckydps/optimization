@@ -1,3 +1,7 @@
+GATE zero 0 dout=CONST0;
+
+GATE one 0 dout=CONST1;
+
 GATE buf 2 dout=din;
 PIN din NONINV 7 35 40 5 6 0
 

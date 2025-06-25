@@ -1,0 +1,105 @@
+# Benchmark "demo_addition_results" written by ABC on Wed Jun 25 08:07:38 2025
+.model demo_addition_results
+.inputs op1_7 op1_6 op1_5 op1_4 op1_3 op1_2 op1_1 op1_0 op2_7 op2_6 op2_5 \
+ op2_4 op2_3 op2_2 op2_1 op2_0
+.outputs result_7 result_6 result_5 result_4 result_3 result_2 result_1 \
+ result_0
+.gate nor4  dina=op2_4 dinb=op2_5 dinc=op2_6 dind=op2_7 dout=new_n30
+.gate not   din=new_n30 dout=new_n31
+.gate nor4  dina=op1_4 dinb=op1_5 dinc=op1_6 dind=op1_7 dout=new_n32
+.gate not   din=new_n32 dout=new_n33
+.gate nor2  dina=new_n33 dinb=new_n31 dout=new_n34
+.gate nand2 dina=op2_1 dinb=op1_1 dout=new_n35
+.gate not   din=new_n35 dout=new_n36
+.gate nand2 dina=op2_0 dinb=op1_0 dout=new_n37
+.gate not   din=new_n37 dout=new_n38
+.gate nor2  dina=new_n38 dinb=new_n36 dout=new_n39
+.gate nor2  dina=op2_2 dinb=op1_2 dout=new_n40
+.gate not   din=new_n40 dout=new_n41
+.gate nor2  dina=op2_1 dinb=op1_1 dout=new_n42
+.gate not   din=new_n42 dout=new_n43
+.gate nand2 dina=new_n43 dinb=new_n41 dout=new_n44
+.gate nor2  dina=new_n44 dinb=new_n39 dout=new_n45
+.gate not   din=new_n45 dout=new_n46
+.gate nand2 dina=op2_2 dinb=op1_2 dout=new_n47
+.gate nand4 dina=new_n47 dinb=new_n46 dinc=op2_3 dind=op1_3 dout=new_n48
+.gate nand2 dina=new_n48 dinb=new_n34 dout=new_n49
+.gate not   din=new_n49 dout=result_2
+.gate not   din=op1_3 dout=new_n51
+.gate not   din=new_n39 dout=new_n52
+.gate not   din=new_n44 dout=new_n53
+.gate nand3 dina=new_n47 dinb=new_n53 dinc=new_n52 dout=new_n54
+.gate nor2  dina=new_n42 dinb=new_n39 dout=new_n55
+.gate not   din=new_n55 dout=new_n56
+.gate not   din=op1_2 dout=new_n57
+.gate nor2  dina=op2_2 dinb=new_n57 dout=new_n58
+.gate not   din=new_n58 dout=new_n59
+.gate nand2 dina=new_n59 dinb=new_n56 dout=new_n60
+.gate nand2 dina=new_n60 dinb=new_n54 dout=new_n61
+.gate not   din=new_n61 dout=new_n62
+.gate nor3  dina=new_n42 dinb=new_n38 dinc=new_n36 dout=new_n63
+.gate not   din=new_n63 dout=new_n64
+.gate nand3 dina=op2_2 dinb=op2_3 dinc=new_n57 dout=new_n65
+.gate nor2  dina=new_n65 dinb=new_n64 dout=new_n66
+.gate not   din=op2_3 dout=new_n67
+.gate nand2 dina=op1_0 dinb=op1_1 dout=new_n68
+.gate not   din=new_n68 dout=new_n69
+.gate nor2  dina=op2_1 dinb=op1_2 dout=new_n70
+.gate not   din=new_n70 dout=new_n71
+.gate nor2  dina=new_n71 dinb=new_n69 dout=new_n72
+.gate nor2  dina=new_n72 dinb=new_n67 dout=new_n73
+.gate not   din=new_n73 dout=new_n74
+.gate not   din=op1_1 dout=new_n75
+.gate not   din=op2_0 dout=new_n76
+.gate nor3  dina=new_n76 dinb=op2_3 dinc=new_n75 dout=new_n77
+.gate nor3  dina=op2_1 dinb=op2_2 dinc=op1_2 dout=new_n78
+.gate not   din=new_n78 dout=new_n79
+.gate nor2  dina=new_n79 dinb=new_n77 dout=new_n80
+.gate not   din=new_n80 dout=new_n81
+.gate nand2 dina=new_n81 dinb=new_n74 dout=new_n82
+.gate not   din=new_n82 dout=new_n83
+.gate nor4  dina=new_n83 dinb=new_n66 dinc=new_n62 dind=new_n51 dout=new_n84
+.gate nand3 dina=op2_3 dinb=new_n57 dinc=new_n51 dout=new_n85
+.gate not   din=op1_0 dout=new_n86
+.gate not   din=op2_1 dout=new_n87
+.gate nor3  dina=new_n87 dinb=new_n86 dinc=op1_1 dout=new_n88
+.gate nor2  dina=op2_2 dinb=op1_1 dout=new_n89
+.gate not   din=new_n89 dout=new_n90
+.gate nor3  dina=new_n90 dinb=new_n88 dinc=new_n85 dout=new_n91
+.gate not   din=new_n91 dout=new_n92
+.gate nand2 dina=new_n92 dinb=new_n34 dout=new_n93
+.gate nor2  dina=new_n93 dinb=new_n84 dout=result_1
+.gate nand2 dina=new_n64 dinb=op2_3 dout=new_n95
+.gate nor2  dina=new_n76 dinb=op2_1 dout=new_n96
+.gate not   din=new_n96 dout=new_n97
+.gate nand2 dina=new_n97 dinb=op1_1 dout=new_n98
+.gate nor2  dina=op2_2 dinb=op2_3 dout=new_n99
+.gate nand2 dina=new_n99 dinb=new_n98 dout=new_n100
+.gate nand2 dina=new_n100 dinb=new_n95 dout=new_n101
+.gate not   din=new_n77 dout=new_n102
+.gate nand2 dina=new_n102 dinb=new_n64 dout=new_n103
+.gate not   din=new_n103 dout=new_n104
+.gate nor2  dina=new_n104 dinb=new_n57 dout=new_n105
+.gate not   din=new_n105 dout=new_n106
+.gate nor2  dina=new_n42 dinb=new_n36 dout=new_n107
+.gate nand2 dina=op2_3 dinb=op1_0 dout=new_n108
+.gate nor2  dina=new_n108 dinb=new_n107 dout=new_n109
+.gate nor3  dina=op2_2 dinb=op2_3 dinc=op1_1 dout=new_n110
+.gate nor2  dina=new_n110 dinb=new_n109 dout=new_n111
+.gate not   din=new_n111 dout=new_n112
+.gate nand2 dina=new_n112 dinb=op2_0 dout=new_n113
+.gate nand4 dina=new_n113 dinb=new_n106 dinc=new_n101 dind=op1_3 dout=new_n114
+.gate not   din=new_n114 dout=new_n115
+.gate not   din=new_n34 dout=new_n116
+.gate nor2  dina=op2_1 dinb=op1_0 dout=new_n117
+.gate nor2  dina=new_n117 dinb=new_n88 dout=new_n118
+.gate nor3  dina=new_n118 dinb=new_n85 dinc=new_n53 dout=new_n119
+.gate nor2  dina=new_n119 dinb=new_n116 dout=new_n120
+.gate not   din=new_n120 dout=new_n121
+.gate nor2  dina=new_n121 dinb=new_n115 dout=result_0
+.gate zero  dout=result_7
+.gate zero  dout=result_6
+.gate zero  dout=result_5
+.gate zero  dout=result_4
+.gate zero  dout=result_3
+.end

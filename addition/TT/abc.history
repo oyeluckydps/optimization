@@ -61,3 +61,85 @@ read_library ../finfet.genlib
 read_library ../finfet7.genlib
 read_library ../gaafet3.genlib
 read_library ../cmos45.genlib
+write_dot -n demo_circuit_dc2_balance.dot
+write_dot demo_circuit_dc2_balance.dot
+read_library ../minimal.genlib 
+read_library ../cmos45.genlib 
+source -s abc.rc
+read_library ../minimal.genlib
+read_library ../finfet7.genlib
+read_library ../gaafet3.genlib
+read_library ../cmos45.genlib
+read_pla demo_addition_results.pla
+balance
+dnsize
+stime
+strash
+resyn2       
+print_library -v
+show_critical
+print_timing
+print_stats -t    # Timing-aware stats
+print_level       # Show logic levels
+report_delay      # Delay analysis
+print_nodes
+balance
+print_stats
+rewrite
+print_stats
+refactor
+print_stats
+balance
+print_stats
+rewrite
+print_stats
+rewrite -z
+print_stats
+balance
+print_stats
+refactor -z
+print_stats
+rewrite -z
+print_stats
+balance
+print_stats
+print_gates
+relevel
+refactor
+rewrite
+refactor -z
+balance
+write_pla ./demo_aig_optimized/current_optimized.pla
+write_bench ./demo_aig_optimized/current_optimized.bench
+write_verilog ./demo_aig_optimized/current_optimized.v
+write_aiger ./demo_aig_optimized/current_optimized.aig
+write_dot ./demo_aig_optimized/current_optimized.dot
+strash
+refactor
+rewrite
+refactor -z
+rewrite -z
+balance
+PRINT_GATES
+print_stats
+write_verilog ./demo_area_optimized/mapped_optimized.v
+write_bench ./demo_area_optimized/mapped_optimized.bench
+write_blif ./demo_area_optimized/mapped_optimized.blif
+write_dot ./demo_area_optimized/mapped_optimized.dot
+print_gates > ./demo_area_optimized/gate_breakdown.txt
+strash
+write_pla ./demo_area_optimized/mapped_optimized.pla
+print_gates
+stime          
+print_levels
+print_level
+print_timing
+show_critical
+print_stats -detailed
+print_stats
+print_stats -h
+path
+delay
+strash
+compress2
+which abc
