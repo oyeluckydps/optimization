@@ -1,0 +1,13 @@
+GATE buf   1   dout=din;
+PIN din NONINV 1 1 1 0 1 0
+
+GATE not   1   dout=!din;                      
+PIN din NONINV 1 1 1 0 1 0
+
+GATE nand   2   dout=!(dina*dinb);                 
+PIN dina NONINV 1 1 1 0 1 0
+PIN dinb NONINV 1 1 1 0 1 0
+
+GATE nor    2   dout=!(dina+dinb);                 
+PIN dina NONINV 1 1 1 0 1 0
+PIN dinb NONINV 1 1 1 0 1 0

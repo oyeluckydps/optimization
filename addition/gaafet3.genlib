@@ -1,0 +1,35 @@
+GATE buf 2 dout=din;
+PIN din NONINV 7 35 40 5 6 0
+
+GATE not 2 dout=!din;
+PIN din NONINV 7 40 45 6 7 0
+
+GATE nand2 4 dout=!(dina*dinb);
+PIN dina NONINV 14 50 60 8 10 0
+PIN dinb NONINV 14 50 60 8 10 0
+
+GATE nand3 6 dout=!(dina*dinb*dinc);
+PIN dina NONINV 18 65 75 10 12 0
+PIN dinb NONINV 18 65 75 10 12 0
+PIN dinc NONINV 18 65 75 10 12 0
+
+GATE nand4 8 dout=!(dina*dinb*dinc*dind);
+PIN dina NONINV 23 80 95 12 15 0
+PIN dinb NONINV 23 80 95 12 15 0
+PIN dinc NONINV 23 80 95 12 15 0
+PIN dind NONINV 23 80 95 12 15 0
+
+GATE nor2 4 dout=!(dina+dinb);
+PIN dina NONINV 16 55 65 9 11 0
+PIN dinb NONINV 16 55 65 9 11 0
+
+GATE nor3 6 dout=!(dina+dinb+dinc);
+PIN dina NONINV 22 70 85 11 14 0
+PIN dinb NONINV 22 70 85 11 14 0
+PIN dinc NONINV 22 70 85 11 14 0
+
+GATE nor4 8 dout=!(dina+dinb+dinc+dind);
+PIN dina NONINV 27 85 100 14 18 0
+PIN dinb NONINV 27 85 100 14 18 0
+PIN dinc NONINV 27 85 100 14 18 0
+PIN dind NONINV 27 85 100 14 18 0

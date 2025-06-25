@@ -1,0 +1,63 @@
+dos2unix complete_addition_results.tt
+read_truth complete_addition_results.tt
+read_truth demo_addition_results.tt
+print_io
+write_verilog demo_circuit.v
+print_stat
+strash
+print_stats
+sudo apt install evince
+show
+write_dot demo_circuit.dot
+print_sop
+print_factored
+print_level
+write_pla output_demo_circuit.pla
+write_bench output.bench
+write_blif original_demo_circuit.blif
+ write_blif original_demo_circuit.blif
+eliminate
+print_gates
+write_dot demo_circuit_strash.dot
+source -s abc.rc
+read_pla demo_addition_results.pla
+strash
+write_dot demo_circuit_dc2.dot
+write_verilog -n demo_circuit_dc2_preserve_names.v
+write_blif demo_cirucit_dc2_preserve_ids.blif
+write_bench demo_circuit_dc2_preserve_bench.bench
+balance
+print_stats
+balance
+print_stats
+map -G nand2,nor2,inv
+map -g
+techmap
+map -f ../nandnor_delay.genlib 
+read_library ../nandnor_delay.genlib
+map
+map -f ../finfet.genlib 
+read_library ../gaafet.genlib
+map
+print_library
+read_library -F ../gaafet.genlib
+map
+read_library -f ../gaafet.genlib
+map
+read_library -E ../gaafet.genlib
+map
+read_library -E ../gaafet.genlib 
+read_library ../gaafet.genlib 
+read_genlib ../gaafet.genlib
+read_genlib minimal.genlib
+read_genlib ../minimal.genlib
+r ../minimal.genlib 
+read_library ../basic.genlib
+read_library ../minimal.genlib 
+source -s abc.rc
+read_library ../minimal.genlib
+read_library ../gaafet.genlib
+read_library ../finfet.genlib
+read_library ../finfet7.genlib
+read_library ../gaafet3.genlib
+read_library ../cmos45.genlib
